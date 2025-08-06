@@ -1,25 +1,69 @@
-name: Build LineageOS 22.2
+name: Build LineageOS 22.2 + Recovery
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: self-hosted
+  build-lineage:
+    runs-on: [self-hosted, linux]
+    timeout-minutes: 720
+
+    env:
+      ROM_URL: https://github.com/LineageOS/android.git
+      ROM_BRANCH: lineage-22.2
+      DEVICE_CODENAME: gta9
+      DEVICE_PATH: device/samsung/gta9
+      MAKE_TARGET: bacon
+      BUILD_RECOVERY_IMAGE: true
 
     steps:
-    - name: Checkout this repo
-      uses: actions/checkout@v4
+      - name: Checkout local manifest
+        uses: actions/checkout@v4
 
-    - name: Setup repo and sync
-      run: ./scripts/setup.sh
+      - name: Install build dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y openjdk-17-jdk bc bison build-essential curl flex g++-multilib gcc-multilib \
+            git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool \
+            libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush \
+            rsync schedtool squashfs-tools x11proto-core-dev xsltproc zip zlib1g-dev git-core python-is-python3
 
-    - name: Build LineageOS
-      run: ./scripts/build.sh
+      - name: Set up ccache (optional)
+        run: |
+          sudo apt install -y ccache
+          export USE_CCACHE=1
+          ccache -M 100G
 
-    - name: Upload ROM
-      if: success()
-      uses: actions/upload-artifact@v4
-      with:
-        name: lineage_gta9
-        path: out/target/product/gta9/*.zip
+      - name: Sync ROM source
+        run: |
+          mkdir -p ~/lineage
+          cd ~/lineage
+          repo init -u ${{ env.ROM_URL }} -b ${{ env.ROM_BRANCH }}
+          repo sync -c --no-tags --no-clone-bundle --force-sync -j$(nproc --all)
+
+      - name: Clone device, vendor, and kernel trees
+        run: |
+          cd ~/lineage
+          git clone https://github.com/sir-solderet/android_device_samsung_gta9.git ${{ env.DEVICE_PATH }}
+          git clone https://github.com/sir-solderet/vendor_samsung_gta9.git vendor/samsung/gta9
+          git clone https://github.com/sir-solderet/android_kernel_samsung_gta9.git kernel/samsung/gta9
+
+      - name: Setup environment
+        run: |
+          cd ~/lineage
+          source build/envsetup.sh
+          lunch lineage_${{ env.DEVICE_CODENAME }}-userdebug
+
+      - name: Build LineageOS and Recovery
+        run: |
+          cd ~/lineage
+          export TARGET_BUILD_RECOVERY_IMAGE=true
+          mka ${{ env.MAKE_TARGET }} recoveryimage -j$(nproc --all)
+
+      - name: Upload ROM & Recovery Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lineage22.2-${{ env.DEVICE_CODENAME }}-rom+recovery
+          path: |
+            ~/lineage/out/target/product/${{ env.DEVICE_CODENAME }}/*.zip
+            ~/lineage/out/target/product/${{ env.DEVICE_CODENAME }}/recovery.img
