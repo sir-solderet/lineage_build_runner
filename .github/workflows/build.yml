@@ -1,0 +1,25 @@
+name: Build LineageOS 22.2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout this repo
+      uses: actions/checkout@v4
+
+    - name: Setup repo and sync
+      run: ./scripts/setup.sh
+
+    - name: Build LineageOS
+      run: ./scripts/build.sh
+
+    - name: Upload ROM
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lineage_gta9
+        path: out/target/product/gta9/*.zip
