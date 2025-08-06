@@ -23,6 +23,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt update
+          sudo apt upgrade
            sudo apt install -y openjdk-17-jdk bc bison build-essential curl flex g++-multilib gcc-multilib \
              git gnupg gperf imagemagick libncurses-dev lib32readline-dev lib32z1-dev liblz4-tool \
              libsdl2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush \
