@@ -15,7 +15,7 @@ jobs:
       DEVICE_PATH: device/samsung/gta9
       MAKE_TARGET: bacon
       BUILD_RECOVERY_IMAGE: true
-      LUNCH_COMBO: lineage_gta9_bp3a-userdebug
+      LUNCH_COMBO: lineage_gta9_bp2a-userdebug
 
     steps:
       - name: Checkout local manifest
