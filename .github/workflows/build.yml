@@ -53,13 +53,13 @@ jobs:
 
           # Clean up old directories to avoid clone errors
           rm -rf ${{ env.DEVICE_PATH }}
-          rm -rf vendor/samsung/gta9
+         # rm -rf vendor/samsung/gta9
           rm -rf kernel/samsung/gta9
           rm -rf device/mediatek/sepolicy_vndr
 
           # Clone fresh trees
           git clone https://github.com/sir-solderet/android_device_samsung_gta9.git ${{ env.DEVICE_PATH }}
-          git clone https://github.com/sir-solderet/vendor_samsung_gta9.git vendor/samsung/gta9
+         # git clone https://github.com/sir-solderet/vendor_samsung_gta9.git vendor/samsung/gta9
           git clone https://github.com/sir-solderet/android_kernel_samsung_gta9.git kernel/samsung/gta9
 
           # Clone Mediatek SEPolicy
