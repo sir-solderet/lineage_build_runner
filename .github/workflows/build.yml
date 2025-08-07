@@ -24,17 +24,21 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt update
-          sudo apt upgrade -y
-           sudo apt install -y openjdk-17-jdk bc bison build-essential curl flex g++-multilib gcc-multilib \
-             git gnupg gperf imagemagick libncurses-dev lib32readline-dev lib32z1-dev liblz4-tool \
-             libsdl2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush \
-             rsync schedtool squashfs-tools xsltproc zip zlib1g-dev git-core python-is-python3
-          
-      - name: Set up ccache (optional)
+          sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y
+          sudo apt install -y openjdk-17-jdk bc bison build-essential curl flex g++-multilib gcc-multilib \
+            git gnupg gperf imagemagick libncurses-dev lib32readline-dev lib32z1-dev liblz4-tool \
+            libsdl2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush \
+            rsync schedtool squashfs-tools xsltproc zip zlib1g-dev git-core python-is-python3 ccache
+
+      - name: Install repo tool if missing
         run: |
-          sudo apt install -y ccache
-          export USE_CCACHE=1
-          ccache -M 100G
+          if ! command -v repo &> /dev/null; then
+            mkdir -p ~/bin
+            curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+            chmod a+x ~/bin/repo
+            echo 'export PATH=~/bin:$PATH' >> ~/.bashrc
+            export PATH=~/bin:$PATH
+          fi
 
       - name: Sync ROM source
         run: |
@@ -51,6 +55,7 @@ jobs:
           rm -rf ${{ env.DEVICE_PATH }}
           rm -rf vendor/samsung/gta9
           rm -rf kernel/samsung/gta9
+          rm -rf device/mediatek/sepolicy_vndr
 
           # Clone fresh trees
           git clone https://github.com/sir-solderet/android_device_samsung_gta9.git ${{ env.DEVICE_PATH }}
@@ -58,18 +63,13 @@ jobs:
           git clone https://github.com/sir-solderet/android_kernel_samsung_gta9.git kernel/samsung/gta9
 
           # Clone Mediatek SEPolicy
-          rm -rf device/mediatek/sepolicy_vndr
           git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr.git device/mediatek/sepolicy_vndr
 
-      - name: Setup environment
+      - name: Setup and Build LineageOS + Recovery
         run: |
           cd ~/lineage
           source build/envsetup.sh
           lunch ${{ env.LUNCH_COMBO }}
-
-      - name: Build LineageOS and Recovery
-        run: |
-          cd ~/lineage
           export TARGET_BUILD_RECOVERY_IMAGE=true
           mka ${{ env.MAKE_TARGET }} -j$(nproc --all)
           mka recoveryimage -j$(nproc --all)
