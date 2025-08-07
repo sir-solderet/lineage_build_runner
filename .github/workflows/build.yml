@@ -53,7 +53,7 @@ jobs:
 
           # Clean up old directories to avoid clone errors
           rm -rf ${{ env.DEVICE_PATH }}
-          # rm -rf vendor/samsung/gta9
+          # rm -rf vendor/samsung/gta9  # Vendor will be cloned manually
           rm -rf kernel/samsung/gta9
           rm -rf device/mediatek/sepolicy_vndr
 
