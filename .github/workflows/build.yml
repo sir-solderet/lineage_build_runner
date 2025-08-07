@@ -60,7 +60,7 @@ jobs:
         run: |
           cd ~/lineage
           source build/envsetup.sh
-          lunch lineage_${{ env.DEVICE_CODENAME }}-userdebug
+          lunch lineage_${{ env.DEVICE_CODENAME }}_bp3a-userdebug
 
       - name: Build LineageOS and Recovery
         run: |
