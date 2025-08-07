@@ -15,6 +15,7 @@ jobs:
       DEVICE_PATH: device/samsung/gta9
       MAKE_TARGET: bacon
       BUILD_RECOVERY_IMAGE: true
+      LUNCH_COMBO: lineage_gta9_bp3a-userdebug
 
     steps:
       - name: Checkout local manifest
@@ -60,7 +61,7 @@ jobs:
         run: |
           cd ~/lineage
           source build/envsetup.sh
-          lunch lineage_${{ env.DEVICE_CODENAME }}_bp3a-userdebug
+          lunch ${{ env.LUNCH_COMBO }}
 
       - name: Build LineageOS and Recovery
         run: |
