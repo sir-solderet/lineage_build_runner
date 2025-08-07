@@ -58,6 +58,7 @@ jobs:
           git clone https://github.com/sir-solderet/android_kernel_samsung_gta9.git kernel/samsung/gta9
 
           # Clone Mediatek SEPolicy
+          rm -rf device/mediatek/sepolicy_vndr
           git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr.git device/mediatek/sepolicy_vndr
 
       - name: Setup environment
