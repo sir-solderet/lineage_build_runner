@@ -2,5 +2,5 @@
 set -e
 
 source build/envsetup.sh
-lunch lineage_gta9-userdebug
+lineage_gta9_bp2a-userdebug
 make bacon -j$(nproc --all)
