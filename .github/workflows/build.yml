@@ -56,7 +56,7 @@ jobs:
           # rm -rf device/samsung/mt6789-common
           # rm -rf vendor/samsung/gta9  # Vendor will be cloned manually
           # rm -rf kernel/samsung/gta9
-          rm -rf device/mediatek/sepolicy_vndr
+          # rm -rf device/mediatek/sepolicy_vndr
 
           # Clone fresh trees
           # git clone https://github.com/sir-solderet/android_device_samsung_gta9_old.git ${{ env.DEVICE_PATH }}
@@ -65,7 +65,7 @@ jobs:
           # git clone https://github.com/sir-solderet/android_kernel_samsung_gta9.git kernel/samsung/gta9
 
           # Clone Mediatek SEPolicy
-          git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr.git device/mediatek/sepolicy_vndr
+          # git clone https://github.com/LineageOS/android_device_mediatek_sepolicy_vndr.git device/mediatek/sepolicy_vndr
 
       - name: Setup and Build LineageOS + Recovery
         run: |
@@ -74,7 +74,7 @@ jobs:
           lunch ${{ env.LUNCH_COMBO }}
           export TARGET_BUILD_RECOVERY_IMAGE=true
           # mka ${{ env.MAKE_TARGET }} -j$(nproc --all)
-          mka recoveryimage -j$(nproc --all)
+          mka recoveryimage -j4
 
       - name: Upload ROM & Recovery Artifacts
         uses: actions/upload-artifact@v4
